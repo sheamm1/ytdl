@@ -30,10 +30,6 @@ at it. YouTube and X work without cookies.
 ./ytdl "URL" --list                 # all available formats
 ```
 
-## Roadmap
-
-- **Android app** — wrap the tool in a native app (Capacitor), in the works.
-
 ## Requirements
 
 `python3` (3.9+) and `curl`. `setup.sh` handles the rest (yt-dlp + ffmpeg,
