@@ -1,0 +1,80 @@
+name: Pages — build APK + publish landing site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - "frontend/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      # ---- Build the web app + Android APK ----
+      - name: Install frontend deps
+        working-directory: frontend
+        run: npm ci
+
+      # Bake in the public backend URL the APK will talk to.
+      # Override with a repo secret/variable API_BASE if your host differs.
+      - name: Build web app
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_BASE: ${{ vars.API_BASE || 'https://ytdl.app' }}
+
+      - name: Sync Capacitor
+        working-directory: frontend
+        run: npx cap sync android
+
+      - name: Build release APK (unsigned)
+        working-directory: frontend/android
+        run: ./gradlew assembleRelease
+
+      # ---- Assemble the Pages site ----
+      - name: Stage site + APK
+        run: |
+          mkdir -p site/app
+          cp frontend/android/app/build/outputs/apk/release/app-release-unsigned.apk \
+             site/app/youfetch.apk
+          # Zip-align + a human-friendly name is optional; keep the raw unsigned APK.
+          ls -lh site/app/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

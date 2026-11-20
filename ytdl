@@ -1,0 +1,10 @@
+#!/bin/bash
+# Portable wrapper: runs ytdl.py using the repo's virtualenv.
+# If the venv doesn't exist yet, run ./setup.sh first.
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if [ -x "$DIR/castenv/bin/python" ]; then
+    exec "$DIR/castenv/bin/python" "$DIR/ytdl.py" "$@"
+else
+    echo "Virtualenv not found. Run: ./setup.sh" >&2
+    exit 1
+fi

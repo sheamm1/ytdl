@@ -1,0 +1,6 @@
+# Backend (server/) dependencies.
+# Install into the same venv used by the CLI:
+#   castenv/bin/pip install -r requirements.txt
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7

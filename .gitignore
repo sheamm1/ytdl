@@ -1,0 +1,31 @@
+# Python virtualenv (created by setup.sh)
+castenv/
+
+# Static ffmpeg binaries (created by setup.sh)
+bin/
+
+# Downloaded media
+downloads/
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+MONETIZATION.md
+
+# Android / Capacitor project (regenerated via `npx cap add android`)
+frontend/android/
+
+# Local tooling history
+.bluesploit_history
+
+# Node
+frontend/node_modules/
